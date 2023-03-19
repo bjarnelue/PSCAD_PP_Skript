@@ -205,8 +205,19 @@ def create_trafos_from_pscad():
 
         # check which side is the low voltage side and set voltages and winding types for both sides
         if v1 < v2:
-            lv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
-            hv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
+            if not df.empty:
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "lv_bus"]):
+                    lv_bus = df.at[df[df["Name"] == name].index[0], "lv_bus"]
+                else:
+                    lv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "hv_bus"]):
+                    lv_bus = df.at[df[df["Name"] == name].index[0], "hv_bus"]
+                else:
+                    hv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
+            else:
+                lv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
+                hv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
+                
             vn_hv_kv = v2
             vn_lv_kv = v1
             vector_group = winding_2.upper() + winding_1.lower()
@@ -220,8 +231,19 @@ def create_trafos_from_pscad():
                 tap_side = ""
 
         else:
-            lv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
-            hv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
+            if not df.empty:
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "lv_bus"]):
+                    lv_bus = df.at[df[df["Name"] == name].index[0], "lv_bus"]
+                else:
+                    lv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "hv_bus"]):
+                    lv_bus = df.at[df[df["Name"] == name].index[0], "hv_bus"]
+                else:
+                    hv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
+            else:
+                lv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
+                hv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
+            
             vn_hv_kv = v1
             vn_lv_kv = v2
             vector_group = winding_1.upper() + winding_2.lower()
@@ -306,10 +328,17 @@ def create_loads_from_pscad():
 
     for load in load_list:
         name = int(load._id[0])
-        bus = get_bus_index(get_bus(load.get_port_location("IA")))
         p_mw = float(load.get_parameters()["PO"].split("[")[0].replace(" ", "")) * 3
         q_mvar = float(load.get_parameters()["QO"].split("[")[0].replace(" ", "")) * 3
 
+        if not df.empty:
+            if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
+                bus = df.at[df[df["Name"] == name].index[0], "bus"]
+            else:
+                bus = get_bus_index(get_bus(load.get_port_location("IA")))
+        else:
+            bus = get_bus_index(get_bus(load.get_port_location("IA")))        
+        
         pp.create_load(net=net, bus=bus, p_mw=p_mw, q_mvar=q_mvar, name=name)
 
 
@@ -353,7 +382,13 @@ def create_gens_from_pscad():
             # only used for slack bus
             va_degree = float(gen.get_parameters()["Ph"].split("[")[0].replace(" ", ""))
 
-            bus = get_bus_index(get_bus(gen.get_port_location("N3")))
+            if not df.empty:
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
+                    bus = df.at[df[df["Name"] == name].index[0], "bus"]
+                else:
+                    bus = get_bus_index(get_bus(gen.get_port_location("N3")))
+            else:
+                bus = get_bus_index(get_bus(gen.get_port_location("N3")))
 
         elif str(gen.get_definition()) == "master:source_3":
             p_mw = float(gen.get_parameters()["Pinit"].split("[")[0].replace(" ", ""))
@@ -361,7 +396,13 @@ def create_gens_from_pscad():
             # only used for slack bus
             va_degree = float(gen.get_parameters()["PhT"].split("[")[0].replace(" ", ""))
 
-            bus = get_bus_index(get_bus(gen.get_port_location("N")))
+            if not df.empty:
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
+                    bus = df.at[df[df["Name"] == name].index[0], "bus"]
+                else:
+                    bus = get_bus_index(get_bus(gen.get_port_location("N")))
+            else:
+                bus = get_bus_index(get_bus(gen.get_port_location("N")))
 
         # check if gen is connected to slack bus
         if bus == get_bus_index(slack_ent.get()):
@@ -592,10 +633,20 @@ def create_cap_banks_from_pscad():
     for cap in cap_list:
         name = int(cap._id[0])
 
-        try:
-            bus = get_bus_index(get_bus(cap.get_port_location("A")))
-        except KeyError:
-            bus = get_bus_index(get_bus(cap.get_port_location("B")))
+        if not df.empty:
+            if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
+                bus = df.at[df[df["Name"] == name].index[0], "bus"]
+            else:
+                try:
+                    bus = get_bus_index(get_bus(cap.get_port_location("A")))
+                except KeyError:
+                    bus = get_bus_index(get_bus(cap.get_port_location("B")))
+        else:
+            try:
+                bus = get_bus_index(get_bus(cap.get_port_location("A")))
+            except KeyError:
+                bus = get_bus_index(get_bus(cap.get_port_location("B")))
+        
 
         # get base voltage for reactive power calculation from connected bus
         vn_kv = net.bus["vn_kv"][bus]
@@ -732,7 +783,7 @@ def button_create_man_inp():
     workbook = xlsxwriter.Workbook(directory + "\\" + "man_input.xlsx")
 
     trafo_list = main.find_all("master:xfmr-3p2w")
-    if len(trafo_list) > 0:
+    if trafo_list:
         sheet_trafo = workbook.add_worksheet(name="trafo")
         sheet_trafo.write("A1", "Name")
         sheet_trafo.write("B1", "hv_bus")
@@ -743,7 +794,7 @@ def button_create_man_inp():
         sheet_trafo.write("G1", "tap_neutral")
 
     gen_list = main.find_all("master:source3") + main.find_all("master:source_3")
-    if len(gen_list) > 0:
+    if gen_list:
         sheet_gen = workbook.add_worksheet(name="gen")
         sheet_gen.write("A1", "Name")
         sheet_gen.write("B1", "Bus")
@@ -751,19 +802,19 @@ def button_create_man_inp():
         sheet_gen.write("D1", "min_q_mvar")
 
     line_list = main.find_all("TLine") + main.find_all("Cable")
-    if len(line_list) > 0:
+    if line_list:
         sheet_line = workbook.add_worksheet(name="line")
         sheet_line.write("A1", "Name")
         sheet_line.write("B1", "max_i_ka")
 
     load_list = main.find_all("master:fixed_load")
-    if len(load_list) > 0:
+    if load_list:
         sheet_load = workbook.add_worksheet(name="load")
         sheet_load.write("A1", "Name")
         sheet_load.write("B1", "Bus")
 
     shunt_list = main.find_all("master:capacitor")
-    if len(shunt_list) > 0:
+    if shunt_list:
         sheet_cap_bank = workbook.add_worksheet(name="cap_bank")
         sheet_cap_bank.write("A1", "Name")
         sheet_cap_bank.write("B1", "Bus")
