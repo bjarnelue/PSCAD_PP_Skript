@@ -217,7 +217,7 @@ def create_trafos_from_pscad():
             else:
                 lv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
                 hv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
-                
+
             vn_hv_kv = v2
             vn_lv_kv = v1
             vector_group = winding_2.upper() + winding_1.lower()
@@ -243,7 +243,7 @@ def create_trafos_from_pscad():
             else:
                 lv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
                 hv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
-            
+
             vn_hv_kv = v1
             vn_lv_kv = v2
             vector_group = winding_1.upper() + winding_2.lower()
@@ -332,13 +332,13 @@ def create_loads_from_pscad():
         q_mvar = float(load.get_parameters()["QO"].split("[")[0].replace(" ", "")) * 3
 
         if not df.empty:
-            if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
-                bus = df.at[df[df["Name"] == name].index[0], "bus"]
+            if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
+                bus = df.at[df[df["Name"] == name].index[0], "Bus"]
             else:
                 bus = get_bus_index(get_bus(load.get_port_location("IA")))
         else:
-            bus = get_bus_index(get_bus(load.get_port_location("IA")))        
-        
+            bus = get_bus_index(get_bus(load.get_port_location("IA")))
+
         pp.create_load(net=net, bus=bus, p_mw=p_mw, q_mvar=q_mvar, name=name)
 
 
@@ -383,8 +383,8 @@ def create_gens_from_pscad():
             va_degree = float(gen.get_parameters()["Ph"].split("[")[0].replace(" ", ""))
 
             if not df.empty:
-                if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
-                    bus = df.at[df[df["Name"] == name].index[0], "bus"]
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
+                    bus = df.at[df[df["Name"] == name].index[0], "Bus"]
                 else:
                     bus = get_bus_index(get_bus(gen.get_port_location("N3")))
             else:
@@ -397,8 +397,8 @@ def create_gens_from_pscad():
             va_degree = float(gen.get_parameters()["PhT"].split("[")[0].replace(" ", ""))
 
             if not df.empty:
-                if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
-                    bus = df.at[df[df["Name"] == name].index[0], "bus"]
+                if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
+                    bus = df.at[df[df["Name"] == name].index[0], "Bus"]
                 else:
                     bus = get_bus_index(get_bus(gen.get_port_location("N")))
             else:
@@ -634,8 +634,8 @@ def create_cap_banks_from_pscad():
         name = int(cap._id[0])
 
         if not df.empty:
-            if not pd.isna(df.at[df[df["Name"] == name].index[0], "bus"]):
-                bus = df.at[df[df["Name"] == name].index[0], "bus"]
+            if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
+                bus = df.at[df[df["Name"] == name].index[0], "Bus"]
             else:
                 try:
                     bus = get_bus_index(get_bus(cap.get_port_location("A")))
@@ -646,7 +646,6 @@ def create_cap_banks_from_pscad():
                 bus = get_bus_index(get_bus(cap.get_port_location("A")))
             except KeyError:
                 bus = get_bus_index(get_bus(cap.get_port_location("B")))
-        
 
         # get base voltage for reactive power calculation from connected bus
         vn_kv = net.bus["vn_kv"][bus]
@@ -865,8 +864,8 @@ def main():
     global q_limit_var
 
     root = tkinter.Tk()
-    root.title("Panda Test")
-    root.geometry("600x400")
+    root.title("PSCAD Loadflow initializer")
+    root.geometry("650x400")
     root.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
     root.grid_columnconfigure((0, 1, 2, 3), weight=1)
 
@@ -892,14 +891,14 @@ def main():
     ToolTip(man_inp_bt, msg="Create blank excel file for required manual inputs. Select PSCAD file first.")
 
     # create checkbox for selecting whether you want similiar bus names or not
-    sim_bus_cb = tkinter.Checkbutton(master=root, text="Similiar Buses", variable=sim_bus_var, onvalue=True,
+    sim_bus_cb = tkinter.Checkbutton(master=root, text="Similiar bus indices", variable=sim_bus_var, onvalue=True,
                                      offvalue=False)
     sim_bus_cb.grid(row=3, column=0, sticky="ew")
     sim_bus_cb.select()
     ToolTip(sim_bus_cb, msg="If checked, use the same bus indices for PandaPower that are used in PSCAD bus names")
 
     # create checkbox for making excel file from pandapower
-    pp_excel_cb = tkinter.Checkbutton(master=root, text="Create PP Excel File", variable=pp_excel_var, onvalue=True,
+    pp_excel_cb = tkinter.Checkbutton(master=root, text="Create Excel file", variable=pp_excel_var, onvalue=True,
                                       offvalue=False)
     pp_excel_cb.select()
     pp_excel_cb.grid(row=3, column=1, sticky="ew")
@@ -912,7 +911,7 @@ def main():
     ToolTip(build_cb, msg="Build project before the powerflow calculation")
 
     # create checkbox for enforcing q limits
-    q_lim_cb = tkinter.Checkbutton(master=root, text="q limits", variable=q_limit_var, onvalue=True, offvalue=False)
+    q_lim_cb = tkinter.Checkbutton(master=root, text="Q limits", variable=q_limit_var, onvalue=True, offvalue=False)
     q_lim_cb.grid(row=3, column=3, sticky="ew")
     ToolTip(q_lim_cb, msg="Consider Q limits for generators in powerflow calculation")
 
@@ -921,7 +920,7 @@ def main():
     freq_ent.insert(0, "60")
     freq_ent.grid(row=1, column=0)
     ToolTip(freq_ent, msg="Enter frequency for powerflow calculation")
-    freq_label = tkinter.Label(master=root, text="freq")
+    freq_label = tkinter.Label(master=root, text="Frequency")
     freq_label.grid(row=0, column=0)
 
     # create entries for assigning slack bus
@@ -929,7 +928,7 @@ def main():
     slack_ent.insert(0, "Bus1")
     slack_ent.grid(row=1, column=1)
     ToolTip(slack_ent, msg="Enter PSCAD bus name that should be treated as the slack bus")
-    slack_label = tkinter.Label(master=root, text="slack bus")
+    slack_label = tkinter.Label(master=root, text="Slack bus")
     slack_label.grid(row=0, column=1)
 
     # create  entries for amount of pandapower iterations
@@ -938,7 +937,7 @@ def main():
     pp_it_ent.grid(row=1, column=2)
     ToolTip(pp_it_ent,
             msg='Enter amount of maximal iterations for PandaPower powerflow calculation. Enter "auto" for default values')
-    pp_it_label = tkinter.Label(master=root, text="pp iterations")
+    pp_it_label = tkinter.Label(master=root, text="LF iterations")
     pp_it_label.grid(row=0, column=2)
 
     # create entry for initialisation for pandapower powerflow calculation
@@ -947,18 +946,18 @@ def main():
     pp_init_ent.grid(row=1, column=3)
     ToolTip(pp_init_ent,
             msg='Enter initialisation type for PandaPower powerflow calculation. Options are: "auto", "flat", "dc", "results". View PandaPower documentation for further infomation')
-    pp_init_label = tkinter.Label(master=root, text="pp init")
+    pp_init_label = tkinter.Label(master=root, text="LF initialization")
     pp_init_label.grid(row=0, column=3)
 
     # create option menu to select fortran compiler
     fcomp_om = tkinter.OptionMenu(root, fcomp_var, *fcomp_list)
     fcomp_om.grid(row=5, column=0)
     ToolTip(fcomp_om, msg="Select Fortran Compiler")
-    fcomp_label = tkinter.Label(master=root, text="fortran compiler")
+    fcomp_label = tkinter.Label(master=root, text="Compiler")
     fcomp_label.grid(row=4, column=0)
 
     # create button to select file path
-    select_path_bt = tkinter.Button(master=root, text="Select Path", command=button_select_path)
+    select_path_bt = tkinter.Button(master=root, text="Select path", command=button_select_path)
     select_path_bt.grid(row=7, column=0, sticky="ew")
     ToolTip(select_path_bt, msg="Select PSCAD file")
 
