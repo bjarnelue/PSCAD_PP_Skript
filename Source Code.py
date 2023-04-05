@@ -207,11 +207,11 @@ def create_trafos_from_pscad():
         if v1 < v2:
             if not df.empty:
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "lv_bus"]):
-                    lv_bus = df.at[df[df["Name"] == name].index[0], "lv_bus"]
+                    lv_bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "lv_bus"])
                 else:
                     lv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "hv_bus"]):
-                    lv_bus = df.at[df[df["Name"] == name].index[0], "hv_bus"]
+                    lv_bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "hv_bus"])
                 else:
                     hv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
             else:
@@ -233,11 +233,11 @@ def create_trafos_from_pscad():
         else:
             if not df.empty:
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "lv_bus"]):
-                    lv_bus = df.at[df[df["Name"] == name].index[0], "lv_bus"]
+                    lv_bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "lv_bus"])
                 else:
                     lv_bus = get_bus_index(get_bus(trafo.get_port_location("N2")))
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "hv_bus"]):
-                    lv_bus = df.at[df[df["Name"] == name].index[0], "hv_bus"]
+                    lv_bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "hv_bus"])
                 else:
                     hv_bus = get_bus_index(get_bus(trafo.get_port_location("N1")))
             else:
@@ -333,7 +333,7 @@ def create_loads_from_pscad():
 
         if not df.empty:
             if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
-                bus = df.at[df[df["Name"] == name].index[0], "Bus"]
+                bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "Bus"])
             else:
                 bus = get_bus_index(get_bus(load.get_port_location("IA")))
         else:
@@ -384,7 +384,7 @@ def create_gens_from_pscad():
 
             if not df.empty:
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
-                    bus = df.at[df[df["Name"] == name].index[0], "Bus"]
+                    bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "Bus"])
                 else:
                     bus = get_bus_index(get_bus(gen.get_port_location("N3")))
             else:
@@ -398,7 +398,7 @@ def create_gens_from_pscad():
 
             if not df.empty:
                 if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
-                    bus = df.at[df[df["Name"] == name].index[0], "Bus"]
+                    bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "Bus"])
                 else:
                     bus = get_bus_index(get_bus(gen.get_port_location("N")))
             else:
@@ -635,7 +635,7 @@ def create_cap_banks_from_pscad():
 
         if not df.empty:
             if not pd.isna(df.at[df[df["Name"] == name].index[0], "Bus"]):
-                bus = df.at[df[df["Name"] == name].index[0], "Bus"]
+                bus = get_bus_index(df.at[df[df["Name"] == name].index[0], "Bus"])
             else:
                 try:
                     bus = get_bus_index(get_bus(cap.get_port_location("A")))
