@@ -155,7 +155,7 @@ def create_network_graph():
 
 # gets pandapower bus index from name for easier referencing
 def get_bus_index(name):
-    return pp.get_element_index(net=net, element="bus", name=str(name))
+    return pp.get_element_index(net=net, element_type="bus", name=str(name))
 
 
 # creates buses in pandapower with values from pscad
@@ -782,41 +782,36 @@ def button_create_man_inp():
     workbook = xlsxwriter.Workbook(directory + "\\" + "man_input.xlsx")
 
     trafo_list = main.find_all("master:xfmr-3p2w")
-    if trafo_list:
-        sheet_trafo = workbook.add_worksheet(name="trafo")
-        sheet_trafo.write("A1", "Name")
-        sheet_trafo.write("B1", "hv_bus")
-        sheet_trafo.write("C1", "lv_bus")
-        sheet_trafo.write("D1", "tap_step_percent")
-        sheet_trafo.write("E1", "tap_step_degree")
-        sheet_trafo.write("F1", "tap_pos")
-        sheet_trafo.write("G1", "tap_neutral")
+    sheet_trafo = workbook.add_worksheet(name="trafo")
+    sheet_trafo.write("A1", "Name")
+    sheet_trafo.write("B1", "hv_bus")
+    sheet_trafo.write("C1", "lv_bus")
+    sheet_trafo.write("D1", "tap_step_percent")
+    sheet_trafo.write("E1", "tap_step_degree")
+    sheet_trafo.write("F1", "tap_pos")
+    sheet_trafo.write("G1", "tap_neutral")
 
     gen_list = main.find_all("master:source3") + main.find_all("master:source_3")
-    if gen_list:
-        sheet_gen = workbook.add_worksheet(name="gen")
-        sheet_gen.write("A1", "Name")
-        sheet_gen.write("B1", "Bus")
-        sheet_gen.write("C1", "max_q_mvar")
-        sheet_gen.write("D1", "min_q_mvar")
+    sheet_gen = workbook.add_worksheet(name="gen")
+    sheet_gen.write("A1", "Name")
+    sheet_gen.write("B1", "Bus")
+    sheet_gen.write("C1", "max_q_mvar")
+    sheet_gen.write("D1", "min_q_mvar")
 
     line_list = main.find_all("TLine") + main.find_all("Cable")
-    if line_list:
-        sheet_line = workbook.add_worksheet(name="line")
-        sheet_line.write("A1", "Name")
-        sheet_line.write("B1", "max_i_ka")
+    sheet_line = workbook.add_worksheet(name="line")
+    sheet_line.write("A1", "Name")
+    sheet_line.write("B1", "max_i_ka")
 
     load_list = main.find_all("master:fixed_load")
-    if load_list:
-        sheet_load = workbook.add_worksheet(name="load")
-        sheet_load.write("A1", "Name")
-        sheet_load.write("B1", "Bus")
+    sheet_load = workbook.add_worksheet(name="load")
+    sheet_load.write("A1", "Name")
+    sheet_load.write("B1", "Bus")
 
     shunt_list = main.find_all("master:capacitor")
-    if shunt_list:
-        sheet_cap_bank = workbook.add_worksheet(name="cap_bank")
-        sheet_cap_bank.write("A1", "Name")
-        sheet_cap_bank.write("B1", "Bus")
+    sheet_cap_bank = workbook.add_worksheet(name="cap_bank")
+    sheet_cap_bank.write("A1", "Name")
+    sheet_cap_bank.write("B1", "Bus")
 
     # setup sheets with names or ids from PSCAD components
     for i, line in enumerate(line_list):
